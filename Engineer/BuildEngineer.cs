@@ -17,7 +17,7 @@ namespace Engineer
          UI_FloatRange(minValue = 0.0f, maxValue = 1000.0f, stepIncrement = 10.0f, scene = UI_Scene.Editor)]
         public float minBESimTime = 200.0f;      // The minimum time in ms from the start of one simulation to the start of the next
 
-        [KSPField(isPersistant = true, guiActive = false, guiActiveEditor = true, guiName = "Pressure %"),
+        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = true, guiName = "Pressure %"),
          UI_FloatRange(minValue = 0.0f, maxValue = 100.0f, stepIncrement = 1.0f, scene = UI_Scene.Editor)]
         public float percentASP = 100.0f;      // The percentage of sea-level pressure to use for "atmospheric stats"
 
@@ -74,6 +74,24 @@ namespace Engineer
                 print("BuildEngineer: OnStart (" + state + ")");
                 if (state == StartState.Editor)
                 {
+                    LogMsg log = new LogMsg();
+
+                    // Loop through the celestial bodies and dump out some info
+                    foreach (CelestialBody body in FlightGlobals.Bodies)
+                    {
+                        log.buf.AppendLine(body.name + ": GeeASL = " + body.GeeASL);
+                        if (body.atmosphere)
+                        {
+                            log.buf.AppendLine("atmosphereMultiplier  = " + body.atmosphereMultiplier);
+                            log.buf.AppendLine("atmosphereScaleHeight = " + body.atmosphereScaleHeight);
+                        }
+                        else
+                        {
+                            log.buf.AppendLine("No atmosphere");
+                        }
+                    }
+                    MonoBehaviour.print(log.buf);
+
                     this.part.OnEditorAttach += OnEditorAttach;
                     this.part.OnEditorDetach += OnEditorDetach;
                     this.part.OnEditorDestroy += OnEditorDestroy;
@@ -216,6 +234,17 @@ namespace Engineer
 
                 CheckWindowMargin();
             }
+        }
+
+        private void UpdateAltitudeSlider()
+        {
+            // Get the current reference body
+
+            // If it has an atmosphere
+            // Read the max altitude and set the various slider parameters clamping the current value to the new range and show the control
+
+            // Otherwise hide the control
+
         }
 
         private void Window(int windowID)
